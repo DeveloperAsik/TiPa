@@ -36,11 +36,17 @@ class TaskController extends Controller {
         $value = $request->input('value');
         $keyword = $request->input('keyword');
         $total = $request->input('total');
+        $order_key = 'a.' . $request->input('order_key');
+        $order_val = $request->input('order_value');
         if ($id != null) {
             $offset = 0;
             $keyword = 'id';
             $value = $id;
             $total = 1;
+        }
+        if (!$request->input('order_key')) {
+            $order_key = 'a.id';
+            $order_val = 'ASC';
         }
         if ($keyword == 'title') {
             $key = 'a.title';
@@ -78,14 +84,14 @@ class TaskController extends Controller {
                             ->select('a.id', 'a.title AS task_title', 'a.description AS task_description', 'a.created_by AS create_by', 'a.created_at AS task_create_date', 'b.id AS task_type_id', 'b.title AS task_type_name', 'c.id AS task_section_id', 'c.title AS task_section_name')
                             ->leftJoin('tbl_task_types AS b', 'b.id', '=', 'a.task_type_id')
                             ->leftJoin('tbl_task_sections AS c', 'c.id', '=', 'a.task_section_id')
-                            ->where('a.is_active', 1)->limit($total)->offset($offset)->get();
+                            ->where('a.is_active', 1)->limit($total)->offset($offset)->orderBy($order_key, $order_val)->get();
             $total_rows = DB::table($this->table)->leftJoin('tbl_task_types AS b', 'b.id', '=', 'a.task_type_id')->where('a.is_active', 1)->count();
         } else {
             $res = DB::table($this->table)
                             ->select('a.id', 'a.title AS task_title', 'a.description AS task_description', 'a.created_by AS create_by', 'a.created_at AS task_create_date', 'b.id AS task_type_id', 'b.title AS task_type_name', 'c.id AS task_section_id', 'c.title AS task_section_name')
                             ->leftJoin('tbl_task_types AS b', 'b.id', '=', 'a.task_type_id')
                             ->leftJoin('tbl_task_sections AS c', 'c.id', '=', 'a.task_section_id')
-                            ->where([['a.is_active', 1], [$key, $opt, $val]])->limit($total)->offset($offset)->get();
+                            ->where([['a.is_active', 1], [$key, $opt, $val]])->limit($total)->offset($offset)->orderBy($order_key, $order_val)->get();
             $total_rows = DB::table($this->table)->leftJoin('tbl_task_types AS b', 'b.id', '=', 'a.task_type_id')->where([['a.is_active', 1], [$key, $opt, $val]])->count();
         }
         if (isset($res) && !empty($res) && $res != null) {
@@ -96,7 +102,7 @@ class TaskController extends Controller {
     }
 
     public function insert(Request $request) {
-        $post = Request::post();
+        $post = $request->post();
         if (isset($post) && !empty($post)) {
             $res = DB::table($this->table)->insertGetId(
                     [
@@ -118,7 +124,7 @@ class TaskController extends Controller {
     }
 
     public function update(Request $request) {
-        $post = Request::post();
+        $post = $request->post();
         if (isset($post) && !empty($post) && $post['id']) {
             $res = DB::table($this->table)
                     ->where('id', $post['id'])
@@ -136,8 +142,44 @@ class TaskController extends Controller {
         }
     }
 
+    public function update_type(Request $request) {
+        $post = $request->post();
+        if (isset($post) && !empty($post) && $post['id']) {
+            $data = DB::table($this->table)->where([['a.is_active', 1], ['a.id', $post['id']]])->first();
+            if ($data->task_type_id == $post['value']) {
+                return json_encode(array('status' => 201, 'message' => 'Failed update data into db, you cannot update with same value with old one...', 'data' => null));
+            }
+            $res = DB::table($this->table)
+                    ->where('id', $post['id'])
+                    ->update(["a.task_type_id" => $post['value']]);
+            if ($res) {
+                return json_encode(array('status' => 200, 'message' => 'Successfully update data into db', 'data' => array('id' => $post['id'])));
+            } else {
+                return json_encode(array('status' => 201, 'message' => 'Failed update data into db', 'data' => null));
+            }
+        }
+    }
+
+    public function update_section(Request $request) {
+        $post = $request->post();
+        if (isset($post) && !empty($post) && $post['id']) {
+            $data = DB::table($this->table)->where([['a.is_active', 1], ['a.id', $post['id']]])->first();
+            if ($data->task_section_id == $post['value']) {
+                return json_encode(array('status' => 201, 'message' => 'Failed update data into db, you cannot update with same value with old one...', 'data' => null));
+            }
+            $res = DB::table($this->table)
+                    ->where('id', $post['keyword'])
+                    ->update(["task_section_id" => $post['value']]);
+            if ($res) {
+                return json_encode(array('status' => 200, 'message' => 'Successfully update data into db', 'data' => array('id' => $post['id'])));
+            } else {
+                return json_encode(array('status' => 201, 'message' => 'Failed update data into db', 'data' => null));
+            }
+        }
+    }
+
     public function delete() {
-        $post = Request::post();
+        $post = $request->post();
         if (isset($post) && !empty($post) && $post['id']) {
             DB::table($this->table)->where('id', '=', $post['id'])->delete();
         }

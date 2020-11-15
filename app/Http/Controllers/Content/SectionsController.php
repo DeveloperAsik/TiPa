@@ -72,7 +72,7 @@ class SectionsController extends Controller {
     }
 
     public function insert(Request $request) {
-        $post = Request::post();
+        $post = $request->post();
         if (isset($post) && !empty($post)) {
             $res = DB::table($this->table)->insertGetId(
                     [
@@ -92,7 +92,7 @@ class SectionsController extends Controller {
     }
 
     public function update(Request $request) {
-        $post = Request::post();
+        $post = $request->post();
         if (isset($post) && !empty($post) && $post['id']) {
             $res = DB::table($this->table)
                     ->where('id', $post['id'])
@@ -106,7 +106,7 @@ class SectionsController extends Controller {
     }
 
     public function delete() {
-        $post = Request::post();
+        $post = $request->post();
         if (isset($post) && !empty($post) && $post['id']) {
             DB::table($this->table)->where('id', '=', $post['id'])->delete();
         }

@@ -19,7 +19,11 @@ $router->get('/get-list/tasks/{id}', 'Content\TaskController@get_list');
 $router->get('/get-list/tasks', 'Content\TaskController@get_list');
 
 $router->post('/insert/tasks', 'Content\TaskController@insert');
+
 $router->post('/update/tasks', 'Content\TaskController@update');
+$router->post('/update/tasks/type', 'Content\TaskController@update_type');
+$router->post('/update/tasks/section', 'Content\TaskController@update_section');
+
 $router->post('/delete/tasks', 'Content\TaskController@delete');
 
 
