@@ -13,3 +13,4 @@
 |
 */
 $router->get('/', 'Settings\UserController@index');
+$router->get('/get-list/tasks', 'Sections\TaskController@get_list');
