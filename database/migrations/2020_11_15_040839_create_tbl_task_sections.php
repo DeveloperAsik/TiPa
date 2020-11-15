@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTblTasks extends Migration
+class CreateTblTaskSections extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,10 @@ class CreateTblTasks extends Migration
      */
     public function up()
     {
-        Schema::create('tbl_tasks', function (Blueprint $table) {
+        Schema::create('tbl_task_sections', function (Blueprint $table) {
             $table->id()->length(32);
             $table->string('title', 255);
             $table->text('description');
-            $table->integer('task_section_id')->length(32)->unsigned();
-            $table->integer('task_type_id')->length(32)->unsigned();
             $table->tinyInteger('is_active')->length(1)->unsigned();
             $table->integer('created_by')->length(32)->unsigned();
             $table->timestamps();
@@ -32,6 +30,6 @@ class CreateTblTasks extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tbl_tasks');
+        Schema::dropIfExists('tbl_task_sections');
     }
 }
