@@ -16,7 +16,7 @@ $router->get('/', 'Settings\UserController@index');
 
 //get tasks
 $router->get('/get-list/tasks/{id}', 'Content\TaskController@get_list');
-$router->get('/get-list/tasks}', 'Content\TaskController@get_list');
+$router->get('/get-list/tasks', 'Content\TaskController@get_list');
 
 $router->post('/insert/tasks', 'Content\TaskController@insert');
 $router->post('/update/tasks', 'Content\TaskController@update');

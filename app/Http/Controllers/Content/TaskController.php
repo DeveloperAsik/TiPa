@@ -122,7 +122,12 @@ class TaskController extends Controller {
         if (isset($post) && !empty($post) && $post['id']) {
             $res = DB::table($this->table)
                     ->where('id', $post['id'])
-                    ->update(['title' => $post['title'], 'description' => $post['description']]);
+                    ->update([
+                "title" => $post['title'],
+                "description" => $post['description'],
+                "task_section_id" => $post['task_section_id'],
+                "task_type_id" => $post['task_type_id']
+            ]);
             if ($res) {
                 return json_encode(array('status' => 200, 'message' => 'Successfully update data into db', 'data' => array('id' => $post['id'])));
             } else {
